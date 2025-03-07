@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- ADDED -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -77,100 +79,103 @@
             cursor: default;
         }
         header {
-        padding: 1rem;
-        text-align: center;
-        color: #0e0e0e;
+            padding: 1rem;
+            text-align: center;
+            color: #0e0e0e;
         }
         header h1 {
-        font-size: 1.6rem;
-        font-weight: 500;
+            font-size: 1.6rem;
+            font-weight: 500;
         }
         footer {
             text-align: center;
             color: #0e0e0e;
         }
         .tile {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.15);
-        padding: 1rem;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 180px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
         }
         .tile:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
         @media only screen and (max-width: 768px) {
+            .github-logo {
+                width: 32px;
+                height: 32px;
+                top: 5px;
+                right: 5px;
+            }
+            .github-logo2 {
+                width: 32px;
+                height: 32px;
+                top: 5px;
+                right: 5px;
+            }
+            .tile-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-view {
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #cfd8dc;
+                margin-bottom: 1rem;
+            }
+            .detail-content {
+                width: 100%;
+                padding: 1rem;
+            }
+        }
+        /* ADDED: Extra tweak for mobile to display filters nicely in one column if needed */
+        @media only screen and (max-width: 600px) {
+            .filter-container {
+                flex-direction: column;
+            }
+        }
         .github-logo {
-            width: 32px;
-            height: 32px;
-            top: 5px;
-            right: 5px;
-        }
-        .github-logo2 {
-            width: 32px;
-            height: 32px;
-            top: 5px;
-            right: 5px;
-        }
-        .tile-grid {
-            grid-template-columns: 1fr;
-        }
-        .detail-view {
-            flex-direction: column;
-            height: auto;
-        }
-        .sidebar {
-            width: 100%;
-            border-right: none;
-            border-bottom: 1px solid #cfd8dc;
-            margin-bottom: 1rem;
-        }
-        .detail-content {
-            width: 100%;
-            padding: 1rem;
-        }
-        }
-        .github-logo {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 64px;
-        height: 64px;
-        background-color: #ffffff52;
-        border-radius: 50%;
-        padding: 4px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 64px;
+            height: 64px;
+            background-color: #ffffff52;
+            border-radius: 50%;
+            padding: 4px;
         }
     </style>
 </head>
 <body>
 
 <header>
-<img src="sinkholed.png" alt="Sinkholed list logo" width="128" height="128">
-<h4>Sinkholed Domains resolved via sinkhole Name Servers</h4>
+    <img src="sinkholed.png" alt="Sinkholed list logo" width="128" height="128">
+    <h4>Sinkholed Domains resolved via sinkhole Name Servers</h4>
 </header>
 
 <a href="https://github.com/mthcht/awesome-lists/tree/main/Lists/Domains/sinkholed_servers" target="_blank">
-<img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="github-logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="github-logo">
 </a>
-    
 
 <div class="filter-container">
     <select id="tldSelect">
         <option value="">All TLDs</option>
     </select>
-
     <select id="nsSelect">
         <option value="">All NS Servers</option>
     </select>
-
     <button onclick="applyFilters()">Apply Filters</button>
     <button onclick="resetFilters()">Reset Filters</button>
     <button onclick="exportData('json')">Export JSON</button>
@@ -246,31 +251,75 @@ function renderDomains() {
     });
 }
 
+// --- UPDATED TRUNCATED PAGINATION ---
 function renderPagination() {
     const paginationDiv = document.getElementById('pagination');
     paginationDiv.innerHTML = '';
 
     const totalPages = Math.ceil(filteredDomains.length / pageSize);
     const maxPagesToShow = 7;
+
+    // Compute the start/end window around currentPage
     let startPage = Math.max(currentPage - 3, 1);
     let endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
 
+    // PREV BUTTON
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = 'Prev';
+    prevBtn.disabled = (currentPage <= 1);
+    prevBtn.onclick = () => applyFilters(currentPage - 1);
+    paginationDiv.appendChild(prevBtn);
+
+    // If there's space before the first displayed page...
     if (startPage > 1) {
-        paginationDiv.innerHTML += `<button onclick="applyFilters(1)">1</button> ...`;
+        addPageButton(paginationDiv, 1);
+        // If the gap is more than one page, show a clickable "..."
+        if (startPage > 2) {
+            addEllipsisButton(paginationDiv, Math.max(currentPage - maxPagesToShow, 1));
+        }
     }
 
+    // Loop through the visible window of pages
     for (let i = startPage; i <= endPage; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.onclick = () => applyFilters(i);
-        if (i === currentPage) btn.classList.add('current');
-        paginationDiv.appendChild(btn);
+        addPageButton(paginationDiv, i);
     }
 
+    // If there's space after the last displayed page...
     if (endPage < totalPages) {
-        paginationDiv.innerHTML += `... <button onclick="applyFilters(${totalPages})">${totalPages}</button>`;
+        if (endPage < totalPages - 1) {
+            addEllipsisButton(paginationDiv, Math.min(currentPage + maxPagesToShow, totalPages));
+        }
+        addPageButton(paginationDiv, totalPages);
     }
+
+    // NEXT BUTTON
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = 'Next';
+    nextBtn.disabled = (currentPage >= totalPages);
+    nextBtn.onclick = () => applyFilters(currentPage + 1);
+    paginationDiv.appendChild(nextBtn);
 }
+
+// Creates a normal page button
+function addPageButton(container, pageNum) {
+    const btn = document.createElement('button');
+    btn.textContent = pageNum;
+    if (pageNum === currentPage) {
+        btn.classList.add('current');
+    }
+    btn.onclick = () => applyFilters(pageNum);
+    container.appendChild(btn);
+}
+
+// Creates a clickable "..." button
+function addEllipsisButton(container, targetPage) {
+    const dotBtn = document.createElement('button');
+    dotBtn.textContent = '...';
+    dotBtn.onclick = () => applyFilters(targetPage);
+    container.appendChild(dotBtn);
+}
+// --- END UPDATED PAGINATION ---
+
 function exportData(format) {
     const exportContent = filteredDomains.map(d => ({
         domain: d.domain,
@@ -291,13 +340,11 @@ function exportData(format) {
     a.remove();
 }
 
-
 function resetFilters() {
     document.getElementById('tldSelect').value = '';
     document.getElementById('nsSelect').value = '';
     applyFilters();
 }
-
 
 function parseURLParams() {
     const params = new URLSearchParams(window.location.search);
@@ -334,8 +381,6 @@ function autoExportIfNeeded() {
 window.onload = () => {
     loadJSON().then(autoExportIfNeeded);
 };
-
-
 </script>
 
 <footer style="display: flex; justify-content: center; gap: 15px;">
@@ -345,9 +390,7 @@ window.onload = () => {
     <h6>
         GitHub List: <a href="https://github.com/mthcht/awesome-lists/tree/main/Lists/Domains/sinkholed_servers" target="_blank" style="color: gray; text-decoration: none;">mthcht/awesome-lists</a>
     </h6>
-    
 </footer>
-
 
 </body>
 </html>
